@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+
+<robot name="gen3" xmlns:xacro="http://ros.org/wiki/xacro">
+
+
+    <!-- Arguments -->
+    <xacro:arg name="arm" default="gen3" />
+    <xacro:arg name="prefix" default="" />
+    <xacro:arg name="vision" default="false" />
+    <xacro:arg name="parent" default="world" />
+    <xacro:arg name="robot_ip" default="192.168.1.10" />
+    <xacro:arg name="username" default="admin" />
+    <xacro:arg name="password" default="admin" />
+    <xacro:arg name="port" default="10000" />
+    <xacro:arg name="port_realtime" default="10001" />
+    <xacro:arg name="session_inactivity_timeout_ms" default="60000" />
+    <xacro:arg name="connection_inactivity_timeout_ms" default="2000" />
+    <xacro:arg name="gripper" default="" />
+    <xacro:arg name="gripper_joint_name" default="finger_joint" />
+    <xacro:arg name="gripper_max_velocity" default="100.0" />
+    <xacro:arg name="gripper_max_force" default="100.0" />
+    <xacro:arg name="use_internal_bus_gripper_comm" default="false" />
+    <xacro:arg name="tf_prefix" default="" />
+    <xacro:arg name="use_external_cable" default="false" />
+    <xacro:arg name="gripper_com_port" default="/dev/ttyUSB0" />
+    
+    <!-- Define world link -->
+    <link name="world" />
+
+    <!-- Include and load arm macro files -->
+    <xacro:include filename="$(find kortex_description)/gen3_arm/urdf/gen3_macro.xacro" />
+
+    <!-- Load the arm -->
+    <xacro:load_arm
+      prefix="$(arg prefix)"
+      parent="$(arg parent)"
+      vision="$(arg vision)"
+      robot_ip="$(arg robot_ip)"
+      username="$(arg username)"
+      password="$(arg password)"
+      port="$(arg port)"
+      port_realtime="$(arg port_realtime)"
+      session_inactivity_timeout_ms="$(arg session_inactivity_timeout_ms)"
+      connection_inactivity_timeout_ms="$(arg connection_inactivity_timeout_ms)"
+      use_internal_bus_gripper_comm="$(arg use_internal_bus_gripper_comm)"
+      tf_prefix="$(arg tf_prefix)"
+      gripper_joint_name="$(arg gripper_joint_name)"
+      gripper_max_velocity="$(arg gripper_max_velocity)"
+      gripper_max_force="$(arg gripper_max_force)"
+      use_external_cable="$(arg use_external_cable)">
+      <origin xyz="0 0 0" rpy="0 0 0" />  <!-- position the robotic arm in the world -->
+    </xacro:load_arm>
+
+    <!-- Convert the argument to a Xacro property with a different name -->
+    <xacro:property name="gripper_arg" value="$(arg gripper)" />
+
+    <!-- If no gripper, define tool frame here -->
+    <xacro:if value="${gripper_arg == ''}">
+      <link name="tool_frame"/>
+      <joint name="tool_frame_joint" type="fixed">
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <parent link="${last_arm_link}" />
+        <child link="tool_frame" />
+        <axis xyz="0 0 0" />
+      </joint>
+    </xacro:if>
+
+    <!-- Include and load the gripper if defined -->
+    <xacro:unless value="${gripper_arg == ''}">
+      <xacro:include filename="$(find kortex_description)/gripper_robotiq_2f_85/urdf/robotiq_2f_85_macro.xacro" />
+      <!-- last_arm_link is defined in "$(find kortex_description)/gen3_arm/urdf/${arm}_macro.xacro" -->
+      <xacro:load_gripper
+        parent="$(arg prefix)${last_arm_link}"
+        prefix="$(arg prefix)"
+        com_port="$(arg gripper_com_port)"
+        use_internal_bus_gripper_comm="$(arg use_internal_bus_gripper_comm)">
+      </xacro:load_gripper>
+    </xacro:unless>
+
+</robot>
