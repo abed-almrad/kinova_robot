@@ -48,6 +48,13 @@ target_include_directories(
   ${PROJECT_NAME}
   PRIVATE # include is only exposed to the target and not its links
   include
+  ${kinova_binary_api_SOURCE_DIR}/include
+  ${kinova_binary_api_SOURCE_DIR}/include/client
+  ${kinova_binary_api_SOURCE_DIR}/include/client_stubs
+  ${kinova_binary_api_SOURCE_DIR}/include/common
+  ${kinova_binary_api_SOURCE_DIR}/include/messages
+  ${kinova_binary_api_SOURCE_DIR}/include/google/protobuf
+
 )
 
 ament_target_dependencies(
