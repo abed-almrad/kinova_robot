@@ -160,7 +160,12 @@ ros2 action send_goal /robotiq_gripper_controller/gripper_cmd control_msgs/actio
 ros2 topic echo /joint_states
 ```
 
-6. On the topic `/fault_controller/internal_fault` of type example_interfaces::msg::Bool the information if robot is currently faulted can be found.
+6. On the topic `/fault_controller/internal_fault` of type example_interfaces::msg::Bool the information if robot is currently faulted can be found:
+
+Listen to the `/fault_controller/internal_fault`:
+```
+ros2 topic echo /fault_controller/internal_fault
+```
 
 Trigger a robot fault the call the service for resetting the fault (example_interfaces::srv::Trigger).
 
