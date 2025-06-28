@@ -4,6 +4,7 @@
     parent:=end_effector_link
     prefix
     use_internal_bus_gripper_comm:=false
+    sim_ignition:=false
     com_port:=/dev/ttyUSB0">
     <xacro:include filename="$(find robotiq_description)/urdf/robotiq_2f_85_macro.urdf.xacro" />
 
@@ -17,6 +18,7 @@
 
     <xacro:robotiq_gripper
         name="RobotiqGripperHardwareInterface"
+        sim_ignition="${sim_ignition}"
         prefix="${prefix}"
         parent="${parent}"
         include_ros2_control="${include_ros2_control}"
