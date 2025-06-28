@@ -36,7 +36,7 @@ This repository is used to control a kinova robotic arm in both real-life and si
    source ~/workspace/ros2_kortex_ws/install/setup.bash
    ```
 
-## Robot Control
+## Real-Life Robot Control
 
 0. Start the previously created `gen3_rl_control.launch.py` file to bringup and visualize the Gen3 7DoF robotic arm from Kinova:
 
@@ -186,3 +186,55 @@ Deactivate all the controllers using robot.
 ```
 ros2 control switch_controllers --deactivate joint_trajectory_controller robotiq_gripper_controller
 ```
+
+## Simulated Robot Control
+
+0. Start the previously created `gen3_sim_control.launch.py` file to bringup the simulation of the Gen3 7DoF robotic arm from Kinova:
+
+```
+ros2 launch kortex_bringup gen3_sim_control.launch.py
+```
+
+1. You can command the arm by publishing Joint Trajectory messages directly to the joint trajectory controller with joint positions are in **radians**
+
+Non-singularity configuration:
+
+```bash
+ros2 topic pub /joint_trajectory_controller/joint_trajectory trajectory_msgs/JointTrajectory "{
+  joint_names: [joint_1, joint_2, joint_3, joint_4, joint_5, joint_6, joint_7],
+  points: [
+    { positions: [0.0098, -0.28, 0, 2, 0.1309, 1.0416, -1.6], time_from_start: { sec: 10 } },
+  ]
+}" -1
+```
+
+2. You can move the gripper by calling the Action server with the following command and setting the desired `position` of the gripper (`0.1=open`, `0.7=close`):
+
+Open the gripper:
+
+```bash
+ros2 action send_goal /robotiq_gripper_controller/gripper_cmd control_msgs/action/GripperCommand "{command:{position: 0.1, max_effort: 100.0}}"
+```
+
+Close the gripper:
+
+```bash
+ros2 action send_goal /robotiq_gripper_controller/gripper_cmd control_msgs/action/GripperCommand "{command:{position: 0.7, max_effort: 100.0}}"
+```
+
+3. Controllers activation/deactivation:
+
+Deactivate all the controllers using robot.
+
+```
+ros2 control switch_controllers --deactivate joint_trajectory_controller robotiq_gripper_controller
+```
+
+Activate controllers to enable robot control.
+
+```
+ros2 control switch_controllers --activate joint_trajectory_controller robotiq_gripper_controller
+```
+
+4. The twist and the fault controllers were not developed to be used for simulations
+
